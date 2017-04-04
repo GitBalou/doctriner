@@ -11,18 +11,19 @@ if( isset($_POST['id']) ) {
 }
 
 // POST_file
-if( isset( $_FILES)) {
+$msg = "";
+if( isset( $_FILES) && isset($_FILES['file'])) {
 
 	$file = $_FILES['file'];
 	$name = $file['name'];
 	$tmp_name = $file['tmp_name'];
-	$msg = "";
+	
 	if ( move_uploaded_file($tmp_name, "uploads/".$name) ) {
 	    $msg = "Upload ok";
 
 	    $product = new Product();
 	    $product->setName($name);
-	    //$product->setImage("uploads/".$name);
+	    $product->setImage("uploads/".$name);
 	    $entityManager->persist($product);
 	    $entityManager->flush();
 	}
@@ -32,8 +33,22 @@ if( isset( $_FILES)) {
 
 
 }
-// Read images
+
+// repo
 $repo = $entityManager->getRepository('Imie\Entity\Product');
+
+// delete files
+if( isset($_GET['delete'])) {
+	$id = intval($_GET['id']);
+	
+	$prodToDel = $repo->find($id);
+	if( $prodToDel != NULL) {
+		$entityManager->remove($prodToDel);
+		$entityManager->flush();
+	}
+}
+
+// Read images
 $products = $repo->findAll();
 ?>
 
@@ -69,6 +84,7 @@ $products = $repo->findAll();
 			if( $product->getImage() != '') : ?>
 				<li>
 					<img src="<?php echo $product->getImage(); ?>" />
+					<a href="?delete&id=<?php echo $product->getId(); ?>">Supprimer</a>
 				</li>
 <?php		endif;
 		endforeach;
