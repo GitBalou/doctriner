@@ -2,11 +2,18 @@
 include("bootstrap.php");
 
 $repo = $entityManager->getRepository('Imie\Entity\Product');
-$results = $repo->findAll();
+$results = $repo->indexAction('p._name', '%teq%');
 
 foreach ($results as $value) {
 	echo $value->getId().' '.$value->getName()."\n";
 }
+
+$results = $repo->getProductByName('%te%');
+
+foreach ($results as $value) {
+	echo $value->getId().' '.$value->getName()."\n";
+}
+
 
 /*
 $en = $repo->find(1);
